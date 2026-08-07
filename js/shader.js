@@ -104,6 +104,47 @@ void main(){
   float wSh = 1.0 - smoothstep(0.0, 0.45, l0);
   c *= 1.0 + u_highlights * 0.5 * wHi + u_shadows * 0.5 * wSh;
 
+  /* ---- 清晰度 Clarity:中间调局部对比(大半径 unsharp mask)----
+     8 方向大半径采样近似局部亮度场;只放大中间调的高频分量,
+     权重 mw 在 luma=0.5 处为 1、黑白两端为 0,保护高光与阴影不被压出光晕。
+     注意:清晰度/锐化必须在饱和度/分离色调之前执行——采样源是原始纹理 u_tex,
+     若放在去饱和之后,邻域的彩色会把颜色「漏」回黑白画面(出现补色边缘) */
+  vec2 r6 = texel * 6.0;
+  vec3 blur =
+      texture(u_tex, v_uv + vec2( r6.x,  0.0)).rgb + texture(u_tex, v_uv + vec2(-r6.x,  0.0)).rgb +
+      texture(u_tex, v_uv + vec2( 0.0,  r6.y)).rgb + texture(u_tex, v_uv + vec2( 0.0, -r6.y)).rgb +
+      texture(u_tex, v_uv + vec2( r6.x,  r6.y)).rgb + texture(u_tex, v_uv + vec2(-r6.x,  r6.y)).rgb +
+      texture(u_tex, v_uv + vec2( r6.x, -r6.y)).rgb + texture(u_tex, v_uv + vec2(-r6.x, -r6.y)).rgb;
+  blur /= 8.0;
+  /* 与上方色调运算同步:先对 blur 施加相同的曝光/白平衡/对比/色阶,
+     使 unsharp 的差分在同一线性空间中进行(近似,忽略高光/阴影分区权重) */
+  blur *= exp2(u_exposure);
+  blur *= vec3(1.0 + u_temperature * 0.12,
+               1.0 + u_tint        * 0.08,
+               1.0 - u_temperature * 0.12);
+  blur = (blur - 0.18) * (1.0 + u_contrast) + 0.18;
+  if (u_whites >= 0.0) blur /= max(1.0 - u_whites * 0.35, 0.05);
+  else                 blur *= (1.0 + u_whites * 0.35);
+  if (u_blacks >= 0.0) blur = blur * (1.0 - u_blacks * 0.25) + u_blacks * 0.25;
+  else                 blur = (blur + u_blacks * 0.25) / (1.0 + u_blacks * 0.25);
+  float mw = 1.0 - abs(luma(c) * 2.0 - 1.0);
+  c += (c - blur) * u_clarity * 1.2 * mw;
+
+  /* ---- 锐化 Sharpen:5-tap 拉普拉斯核(中心×5 - 四邻域,邻域同步色调运算)---- */
+  vec3 shN = texture(u_tex, v_uv + vec2(0.0,  texel.y)).rgb;
+  vec3 shS = texture(u_tex, v_uv + vec2(0.0, -texel.y)).rgb;
+  vec3 shE = texture(u_tex, v_uv + vec2( texel.x, 0.0)).rgb;
+  vec3 shW = texture(u_tex, v_uv + vec2(-texel.x, 0.0)).rgb;
+  /* 邻域施加与主像素相同的曝光/白平衡/对比/色阶,保证拉普拉斯差分无色偏 */
+  vec4 nb = vec4(shN.r, shS.r, shE.r, shW.r);
+  vec4 ng = vec4(shN.g, shS.g, shE.g, shW.g);
+  vec4 nbb = vec4(shN.b, shS.b, shE.b, shW.b);
+  nb *= exp2(u_exposure); ng *= exp2(u_exposure); nbb *= exp2(u_exposure);
+  nb *= (1.0 + u_temperature * 0.12); ng *= (1.0 + u_tint * 0.08); nbb *= (1.0 - u_temperature * 0.12);
+  nb = (nb - 0.18) * (1.0 + u_contrast) + 0.18; ng = (ng - 0.18) * (1.0 + u_contrast) + 0.18; nbb = (nbb - 0.18) * (1.0 + u_contrast) + 0.18;
+  vec3 sharp = c * 5.0 - vec3(dot(nb, vec4(1.0)), dot(ng, vec4(1.0)), dot(nbb, vec4(1.0)));
+  c = mix(c, sharp, u_sharpen * 0.6);
+
   /* ---- 色相 Hue:灰轴旋转(保亮度) ---- */
   c = hueRotate(c, u_hue);
 
@@ -119,27 +160,6 @@ void main(){
   float satEst = mx - mn;
   float lv = luma(c);
   c = mix(vec3(lv), c, 1.0 + u_vibrance * (1.0 - satEst));
-
-  /* ---- 清晰度 Clarity:中间调局部对比(大半径 unsharp mask)----
-     8 方向大半径采样近似局部亮度场;只放大中间调的高频分量,
-     权重 mw 在 luma=0.5 处为 1、黑白两端为 0,保护高光与阴影不被压出光晕 */
-  vec2 r6 = texel * 6.0;
-  vec3 blur =
-      texture(u_tex, v_uv + vec2( r6.x,  0.0)).rgb + texture(u_tex, v_uv + vec2(-r6.x,  0.0)).rgb +
-      texture(u_tex, v_uv + vec2( 0.0,  r6.y)).rgb + texture(u_tex, v_uv + vec2( 0.0, -r6.y)).rgb +
-      texture(u_tex, v_uv + vec2( r6.x,  r6.y)).rgb + texture(u_tex, v_uv + vec2(-r6.x,  r6.y)).rgb +
-      texture(u_tex, v_uv + vec2( r6.x, -r6.y)).rgb + texture(u_tex, v_uv + vec2(-r6.x, -r6.y)).rgb;
-  blur /= 8.0;
-  float mw = 1.0 - abs(luma(c) * 2.0 - 1.0);
-  c += (c - blur) * u_clarity * 1.2 * mw;
-
-  /* ---- 锐化 Sharpen:5-tap 拉普拉斯核(中心×5 - 四邻域)---- */
-  vec3 shN = texture(u_tex, v_uv + vec2(0.0,  texel.y)).rgb;
-  vec3 shS = texture(u_tex, v_uv + vec2(0.0, -texel.y)).rgb;
-  vec3 shE = texture(u_tex, v_uv + vec2( texel.x, 0.0)).rgb;
-  vec3 shW = texture(u_tex, v_uv + vec2(-texel.x, 0.0)).rgb;
-  vec3 sharp = c * 5.0 - (shN + shS + shE + shW);
-  c = mix(c, sharp, u_sharpen * 0.6);
 
   /* ---- 分离色调 Split Toning:按亮度权重混入染色向量 ----
      暗部混入阴影色、亮部混入高光色(色轮取色后以 0.5 为中心转成偏移量),

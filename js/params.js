@@ -118,6 +118,93 @@ const PRESETS = [
       stShadowHue: 0, stShadowSat: 0, stHighlightHue: 0, stHighlightSat: 0,
     },
   },
+
+  /* =============== 网红风格预设(参数配方来源见 README「预设参考」) =============== */
+
+  /* 奶油柔光:低对比+压高光+抬黑位+降饱和=奶感底座;负清晰度=柔光;
+     微暖中性色温,高光淡粉/阴影淡青绿的小剂量分离色调 */
+  {
+    id: 'cream-glow', zh: '奶油柔光', en: 'Cream Glow',
+    values: {
+      exposure: 0.4, contrast: -18, highlights: -35, shadows: 15, whites: -15, blacks: 15,
+      temperature: 10, tint: 2, saturation: -12, vibrance: 8, hue: 0,
+      clarity: -20, sharpen: 12, grain: 8, fade: 10,
+      vignetteAmount: 8, vignetteRoundness: 60,
+      stShadowHue: 190, stShadowSat: 6, stHighlightHue: 320, stHighlightSat: 6,
+    },
+  },
+  /* 蜜桃肤色:色温色调双正(暖+粉)是蜜桃与奶油的核心区别;
+     锐化偏高保「果汁感」清晰,高光染淡粉 */
+  {
+    id: 'peach-skin', zh: '蜜桃肤色', en: 'Peach Skin',
+    values: {
+      exposure: 0.3, contrast: -15, highlights: -25, shadows: 25, whites: -8, blacks: 8,
+      temperature: 22, tint: 14, saturation: -6, vibrance: 12, hue: 0,
+      clarity: -8, sharpen: 25, grain: 6, fade: 6,
+      vignetteAmount: 6, vignetteRoundness: 60,
+      stShadowHue: 200, stShadowSat: 6, stHighlightHue: 345, stHighlightSat: 8,
+    },
+  },
+  /* 法式珍珠:大幅压高光出「发光/珠光」感,黑点微沉保质感(柔而不灰),
+     冷暖分离色调比奶油明显(高光暖 40°/阴影冷 215°),颗粒模拟胶片珍珠 */
+  {
+    id: 'french-pearl', zh: '法式珍珠', en: 'French Pearl',
+    values: {
+      exposure: 0.2, contrast: -12, highlights: -45, shadows: 30, whites: -12, blacks: -4,
+      temperature: 14, tint: 4, saturation: -4, vibrance: 8, hue: 0,
+      clarity: -12, sharpen: 18, grain: 20, fade: 8,
+      vignetteAmount: 10, vignetteRoundness: 65,
+      stShadowHue: 215, stShadowSat: 14, stHighlightHue: 40, stHighlightSat: 10,
+    },
+  },
+  /* 城市霓虹(赛博分支):冷色温+品红色调;高光压/阴影提后用清晰度找回对比;
+     阴影青蓝 210° + 高光洋红 320°,暗角收拢视线 */
+  {
+    id: 'urban-neon', zh: '城市霓虹', en: 'Urban Neon',
+    values: {
+      exposure: 0.1, contrast: 8, highlights: -30, shadows: 35, whites: 4, blacks: -8,
+      temperature: -18, tint: 12, saturation: 6, vibrance: 10, hue: 0,
+      clarity: 18, sharpen: 20, grain: 8, fade: 6,
+      vignetteAmount: 22, vignetteRoundness: 65,
+      stShadowHue: 210, stShadowSat: 18, stHighlightHue: 320, stHighlightSat: 16,
+    },
+  },
+  /* 海岛晴蓝:冷色温+清晰度(去朦胧)=通透;阴影蓝+高光微橙的冷暖对比让蓝更蓝;
+     零颗粒零褪色,保持干净 */
+  {
+    id: 'island-blue', zh: '海岛晴蓝', en: 'Island Blue',
+    values: {
+      exposure: 0.25, contrast: 10, highlights: -25, shadows: 25, whites: -6, blacks: 10,
+      temperature: -14, tint: 3, saturation: 10, vibrance: 14, hue: 0,
+      clarity: 15, sharpen: 20, grain: 0, fade: 0,
+      vignetteAmount: 6, vignetteRoundness: 60,
+      stShadowHue: 215, stShadowSat: 10, stHighlightHue: 35, stHighlightSat: 6,
+    },
+  },
+  /* 落日金光:强暖打底+微品红防「土黄」;高光橙金 42°/阴影微冷 205° 的冷暖分割
+     是黄金时刻的本质;负清晰度=光雾感;降自然饱和度防「暖过头变橘」 */
+  {
+    id: 'golden-hour', zh: '落日金光', en: 'Golden Hour',
+    values: {
+      exposure: 0.25, contrast: -8, highlights: -35, shadows: 15, whites: -10, blacks: 12,
+      temperature: 32, tint: 6, saturation: 4, vibrance: -4, hue: 0,
+      clarity: -10, sharpen: 12, grain: 6, fade: 8,
+      vignetteAmount: 14, vignetteRoundness: 70,
+      stShadowHue: 205, stShadowSat: 10, stHighlightHue: 42, stHighlightSat: 18,
+    },
+  },
+  /* 抹茶森系:中性微暖(不要冷),色调微偏绿;低饱和+柔结构(负清晰度)
+     +锐化保叶缘细节;暖高光/冷阴影小剂量青橙结构;颗粒+轻暗角出氛围 */
+  {
+    id: 'matcha-forest', zh: '抹茶森系', en: 'Matcha Forest',
+    values: {
+      exposure: 0.3, contrast: -14, highlights: -30, shadows: 20, whites: -8, blacks: 8,
+      temperature: 6, tint: 8, saturation: -16, vibrance: 6, hue: 0,
+      clarity: -15, sharpen: 30, grain: 14, fade: 10,
+      vignetteAmount: 12, vignetteRoundness: 60,
+      stShadowHue: 205, stShadowSat: 7, stHighlightHue: 38, stHighlightSat: 7,
+    },
+  },
 ];
 
 /* 由 PARAMS 表生成某预设(或中性默认值)的完整参数对象 */
