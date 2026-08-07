@@ -81,9 +81,9 @@ void main(){
   c *= exp2(u_exposure);
 
   /* ---- 色温/色调 Temperature/Tint:von-Kries 对角白平衡近似 ----
-     色温沿 蓝↔黄 轴(正=暖),色调沿 绿↔品红 轴(正=偏绿),对角矩阵缩放 */
+     色温沿 蓝↔黄 轴(正=暖),色调沿 绿↔品红 轴(正=品红,与 Lightroom 惯例一致),对角矩阵缩放 */
   c *= vec3(1.0 + u_temperature * 0.12,
-            1.0 + u_tint        * 0.08,
+            1.0 - u_tint        * 0.08,
             1.0 - u_temperature * 0.12);
 
   /* ---- 对比度 Contrast:以 18% 中灰(0.18)为支点的 S 曲线一阶近似 ---- */
@@ -120,7 +120,7 @@ void main(){
      使 unsharp 的差分在同一线性空间中进行(近似,忽略高光/阴影分区权重) */
   blur *= exp2(u_exposure);
   blur *= vec3(1.0 + u_temperature * 0.12,
-               1.0 + u_tint        * 0.08,
+               1.0 - u_tint        * 0.08,
                1.0 - u_temperature * 0.12);
   blur = (blur - 0.18) * (1.0 + u_contrast) + 0.18;
   if (u_whites >= 0.0) blur /= max(1.0 - u_whites * 0.35, 0.05);
@@ -140,7 +140,7 @@ void main(){
   vec4 ng = vec4(shN.g, shS.g, shE.g, shW.g);
   vec4 nbb = vec4(shN.b, shS.b, shE.b, shW.b);
   nb *= exp2(u_exposure); ng *= exp2(u_exposure); nbb *= exp2(u_exposure);
-  nb *= (1.0 + u_temperature * 0.12); ng *= (1.0 + u_tint * 0.08); nbb *= (1.0 - u_temperature * 0.12);
+  nb *= (1.0 + u_temperature * 0.12); ng *= (1.0 - u_tint * 0.08); nbb *= (1.0 - u_temperature * 0.12);
   nb = (nb - 0.18) * (1.0 + u_contrast) + 0.18; ng = (ng - 0.18) * (1.0 + u_contrast) + 0.18; nbb = (nbb - 0.18) * (1.0 + u_contrast) + 0.18;
   vec3 sharp = c * 5.0 - vec3(dot(nb, vec4(1.0)), dot(ng, vec4(1.0)), dot(nbb, vec4(1.0)));
   c = mix(c, sharp, u_sharpen * 0.6);

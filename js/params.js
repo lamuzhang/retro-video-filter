@@ -199,10 +199,109 @@ const PRESETS = [
     id: 'matcha-forest', zh: '抹茶森系', en: 'Matcha Forest',
     values: {
       exposure: 0.3, contrast: -14, highlights: -30, shadows: 20, whites: -8, blacks: 8,
-      temperature: 6, tint: 8, saturation: -16, vibrance: 6, hue: 0,
+      temperature: 6, tint: -8, saturation: -16, vibrance: 6, hue: 0,
       clarity: -15, sharpen: 30, grain: 14, fade: 10,
       vignetteAmount: 12, vignetteRoundness: 60,
       stShadowHue: 205, stShadowSat: 7, stHighlightHue: 38, stHighlightSat: 7,
+    },
+  },
+
+  /* =============== 导演风格 / 胶片模拟(配方来源见 README「预设参考」) =============== */
+
+  /* 重庆森林(王家卫):暗部泛青绿(123°)+高光暖黄橙(41°)是杜可风暗房配光的签名;
+     影调克制(黑位微抬加灰),重颗粒+中暗角出潮湿夜感——与 Lomo 的区别就在影调 */
+  {
+    id: 'chungking', zh: '重庆森林', en: 'Chungking',
+    values: {
+      exposure: -0.15, contrast: 6, highlights: -35, shadows: 30, whites: -18, blacks: 12,
+      temperature: 8, tint: 6, saturation: -10, vibrance: 10, hue: 0,
+      clarity: 12, sharpen: 25, grain: 35, fade: 12,
+      vignetteAmount: 28, vignetteRoundness: 60,
+      stShadowHue: 123, stShadowSat: 14, stHighlightHue: 41, stHighlightSat: 23,
+    },
+  },
+  /* 动漫晴空(新海诚):对比与黑位的「平光化」做到极致(阴影/黑位大抬、对比大降)
+     再拉满饱和糖果化;清晰度+锐化出壁纸通透感——与莫兰迪是光谱两端 */
+  {
+    id: 'anime-sky', zh: '动漫晴空', en: 'Anime Sky',
+    values: {
+      exposure: 0.35, contrast: -55, highlights: -40, shadows: 60, whites: 18, blacks: 55,
+      temperature: -6, tint: -3, saturation: 14, vibrance: 16, hue: 0,
+      clarity: 16, sharpen: 26, grain: 0, fade: 0,
+      vignetteAmount: 0, vignetteRoundness: 50,
+      stShadowHue: 190, stShadowSat: 5, stHighlightHue: 0, stHighlightSat: 0,
+    },
+  },
+  /* 莫兰迪灰:减法做到极致——大幅降饱和+极低对比+黑白位双收,
+     阴影极微量青;画面「蒙一层灰」但不发脏的关键是提阴影 */
+  {
+    id: 'morandi', zh: '莫兰迪灰', en: 'Morandi',
+    values: {
+      exposure: 0.1, contrast: -60, highlights: -50, shadows: 40, whites: -30, blacks: 15,
+      temperature: -4, tint: 0, saturation: -55, vibrance: -10, hue: 0,
+      clarity: -10, sharpen: 8, grain: 4, fade: 14,
+      vignetteAmount: 0, vignetteRoundness: 50,
+      stShadowHue: 190, stShadowSat: 5, stHighlightHue: 45, stHighlightSat: 3,
+    },
+  },
+  /* Lomo 交叉冲印:与重庆森林共用「绿阴影/黄高光」撞色,但影调相反——
+     对比拉满、黑位压死、清晰度暴力、全库最重暗角 */
+  {
+    id: 'lomo-xpro', zh: 'Lomo 交叉冲印', en: 'Lomo X-Pro',
+    values: {
+      exposure: 0, contrast: 45, highlights: -10, shadows: -15, whites: 8, blacks: -18,
+      temperature: -8, tint: -10, saturation: -8, vibrance: 14, hue: 0,
+      clarity: 40, sharpen: 30, grain: 18, fade: 0,
+      vignetteAmount: 45, vignetteRoundness: 55,
+      stShadowHue: 120, stShadowSat: 16, stHighlightHue: 47, stHighlightSat: 20,
+    },
+  },
+  /* 蒸汽波:品红紫撞色(色调大正品红+阴影紫蓝 260°+高光粉 320°),
+     褪色+颗粒做 VHS 复古;与城市霓虹的区别:更粉、更亮、更「塑料」 */
+  {
+    id: 'vaporwave', zh: '蒸汽波', en: 'Vaporwave',
+    values: {
+      exposure: 0, contrast: 14, highlights: -20, shadows: 10, whites: 0, blacks: 6,
+      temperature: -12, tint: 22, saturation: 12, vibrance: 10, hue: 0,
+      clarity: -6, sharpen: 10, grain: 16, fade: 10,
+      vignetteAmount: 14, vignetteRoundness: 60,
+      stShadowHue: 260, stShadowSat: 16, stHighlightHue: 320, stHighlightSat: 18,
+    },
+  },
+  /* 富士 Velvia:反转片逻辑与负片完全相反——高对比、黑位致密不抬、
+     饱和全靠自然饱和度堆(原卷饱和+20%),几乎无颗粒无分离色调 */
+  {
+    id: 'velvia', zh: '富士 Velvia', en: 'Fuji Velvia',
+    values: {
+      exposure: 0.1, contrast: 22, highlights: -30, shadows: -8, whites: 4, blacks: -12,
+      temperature: -2, tint: 0, saturation: 8, vibrance: 30, hue: 0,
+      clarity: 10, sharpen: 22, grain: 4, fade: 0,
+      vignetteAmount: 8, vignetteRoundness: 60,
+      stShadowHue: 0, stShadowSat: 0, stHighlightHue: 0, stHighlightSat: 0,
+    },
+  },
+  /* 宝丽来:全库最重黑位抬升(低于+30 就不像宝丽来)+极低对比+暖黄偏绿偏色
+     (色调负值=偏绿)+粗大颗粒+负清晰度柔焦朦胧+软暗角 */
+  {
+    id: 'polaroid', zh: '宝丽来', en: 'Polaroid',
+    values: {
+      exposure: 0.25, contrast: -30, highlights: -20, shadows: 35, whites: -22, blacks: 40,
+      temperature: 18, tint: -10, saturation: -16, vibrance: -6, hue: 0,
+      clarity: -18, sharpen: 8, grain: 34, fade: 22,
+      vignetteAmount: 20, vignetteRoundness: 70,
+      stShadowHue: 60, stShadowSat: 14, stHighlightHue: 48, stHighlightSat: 10,
+    },
+  },
+  /* 布达佩斯粉(韦斯·安德森):粉彩=低对比+黑位抬起(无纯黑)+暖粉色调;
+     颗粒+轻暗角,与蜜桃肤色的区别:更亮更平、粉色在整体而非只在高光 */
+  {
+    id: 'budapest-pink', zh: '布达佩斯粉', en: 'Budapest Pink',
+    values: {
+      exposure: 0.35, contrast: -22, highlights: -35, shadows: 32, whites: -12, blacks: 24,
+      temperature: 10, tint: 12, saturation: -8, vibrance: 6, hue: 0,
+      clarity: -10, sharpen: 10, grain: 18, fade: 12,
+      vignetteAmount: 10, vignetteRoundness: 65,
+      stShadowHue: 190, stShadowSat: 8, stHighlightHue: 350, stHighlightSat: 8,
     },
   },
 ];
