@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RetroGrade · 复古视频调色</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%23e8a33d'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark"></span>
+    <div class="brand-text">
+      <h1>RetroGrade</h1>
+      <p>复古视频调色 · Retro Video Filter</p>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <span class="badge" id="engine-badge">本地处理 · 视频不出浏览器</span>
+    <button class="btn btn-primary" id="btn-export" disabled>
+      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path fill="currentColor" d="M8 1.5a.75.75 0 0 1 .75.75v6.19l2.22-2.22a.75.75 0 1 1 1.06 1.06l-3.5 3.5a.75.75 0 0 1-1.06 0l-3.5-3.5a.75.75 0 1 1 1.06-1.06l2.22 2.22V2.25A.75.75 0 0 1 8 1.5ZM2.75 13a.75.75 0 0 0 0 1.5h10.5a.75.75 0 0 0 0-1.5H2.75Z"/></svg>
+      导出成片 Export
+    </button>
+  </div>
+</header>
+
+<main class="layout">
+
+  <section class="stage-col">
+    <div class="stage" id="stage">
+      <canvas id="preview-canvas"></canvas>
+      <video id="src-video" playsinline preload="auto"></video>
+
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="上传视频">
+        <div class="dz-inner">
+          <svg class="dz-icon" viewBox="0 0 48 48" aria-hidden="true">
+            <rect x="4" y="10" width="40" height="30" rx="4" fill="none" stroke="currentColor" stroke-width="2.5"/>
+            <path d="M20 20l11 5.5L20 31z" fill="currentColor"/>
+            <path d="M4 16h40M12 10v6M24 10v6M36 10v6" stroke="currentColor" stroke-width="2.5"/>
+          </svg>
+          <p class="dz-title">拖入视频,或点击选择</p>
+          <p class="dz-sub">支持 MP4 / WebM / MOV(以浏览器可解码为准)<br>全程本地处理,不会上传任何数据</p>
+        </div>
+      </div>
+      <input type="file" id="file-input" accept="video/*,.mov,.mkv,.m4v" hidden>
+    </div>
+
+    <div class="controls" id="controls" hidden>
+      <button class="btn btn-icon" id="btn-play" aria-label="播放/暂停">
+        <svg id="icon-play" viewBox="0 0 16 16" width="16" height="16"><path fill="currentColor" d="M4 2.5v11a.5.5 0 0 0 .76.43l9-5.5a.5.5 0 0 0 0-.86l-9-5.5A.5.5 0 0 0 4 2.5Z"/></svg>
+        <svg id="icon-pause" viewBox="0 0 16 16" width="16" height="16" hidden><path fill="currentColor" d="M4 2h3v12H4zM9 2h3v12H9z"/></svg>
+      </button>
+      <span class="time" id="time-cur">0:00</span>
+      <input type="range" class="seek" id="seek" min="0" max="1000" value="0" aria-label="进度条">
+      <span class="time" id="time-dur">0:00</span>
+      <button class="btn btn-ghost" id="btn-compare" title="按住查看原片">对比原片<span class="en">Hold: Original</span></button>
+    </div>
+    <p class="stage-hint" id="stage-hint" hidden></p>
+  </section>
+
+  <aside class="panel" id="panel" hidden>
+    <div class="panel-section">
+      <div class="panel-section-head">
+        <h2>预设 <span class="en">Presets</span></h2>
+        <button class="btn btn-ghost btn-sm" id="btn-reset">重置全部 Reset</button>
+      </div>
+      <div class="preset-grid" id="preset-grid"></div>
+    </div>
+    <div id="param-groups"></div>
+  </aside>
+
+</main>
+
+<div class="export-overlay" id="export-overlay" hidden>
+  <div class="export-card">
+    <h3 id="export-title">正在导出…</h3>
+    <p class="export-mode" id="export-mode"></p>
+    <div class="progress-track"><div class="progress-fill" id="export-fill"></div></div>
+    <div class="export-meta">
+      <span id="export-pct">0%</span>
+      <span id="export-eta"></span>
+    </div>
+    <div class="export-actions">
+      <button class="btn btn-ghost" id="btn-cancel-export">取消 Cancel</button>
+      <a class="btn btn-primary" id="download-link" hidden>下载 Download</a>
+    </div>
+    <p class="export-note" id="export-note"></p>
+  </div>
+</div>
+
+<script src="js/params.js"></script>
+<script src="js/shader.js"></script>
+<script src="js/renderer.js"></script>
+<script src="js/exporter.js"></script>
+<script src="js/main.js"></script>
+</body>
+</html>
