@@ -39,6 +39,7 @@ class Grader {
     this.uRes = gl.getUniformLocation(this.program, 'u_res');
     this.uTime = gl.getUniformLocation(this.program, 'u_time');
     this.uBypass = gl.getUniformLocation(this.program, 'u_bypass');
+    this.uSplit = gl.getUniformLocation(this.program, 'u_split');
     this.frame = 0;
   }
 
@@ -69,8 +70,9 @@ class Grader {
     this.gl.viewport(0, 0, this.canvas.width, this.canvas.height);
   }
 
-  /* source: HTMLVideoElement 或 HTMLCanvasElement(导出路径) */
-  render(source, values, bypass) {
+  /* source: HTMLVideoElement 或 HTMLCanvasElement(导出路径)
+     split: 分屏对比位置 0..1,0 = 关闭(导出路径不传) */
+  render(source, values, bypass, split) {
     const gl = this.gl;
     gl.bindTexture(gl.TEXTURE_2D, this.tex);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
@@ -78,6 +80,7 @@ class Grader {
     gl.uniform2f(this.uRes, this.canvas.width, this.canvas.height);
     gl.uniform1f(this.uTime, this.frame++);
     gl.uniform1f(this.uBypass, bypass ? 1 : 0);
+    gl.uniform1f(this.uSplit, split || 0);
     for (const p of PARAMS) gl.uniform1f(this.u[p.id], values[p.id] / p.norm);
     gl.drawArrays(gl.TRIANGLES, 0, 3);
   }

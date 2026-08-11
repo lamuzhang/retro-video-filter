@@ -21,6 +21,7 @@ uniform sampler2D u_tex;
 uniform vec2  u_res;        // 画布分辨率(px),用于像素级采样与宽高比校正
 uniform float u_time;       // 帧序号,作为胶片颗粒的时间随机种子
 uniform float u_bypass;     // >0.5 时直通原片(「对比原片」按住查看)
+uniform float u_split;      // 分屏对比分割位置 0..1,0 = 关闭(左原片/右调色)
 
 uniform float u_exposure;   // -3..3 (EV 档)
 uniform float u_contrast;   // -1..1
@@ -193,6 +194,15 @@ void main(){
   float start = mix(1.5, 0.55, u_vig_amount);
   float vig = smoothstep(start, start + 0.8, d);
   c *= 1.0 - vig * u_vig_amount * 0.9;
+
+  /* ---- 分屏对比 Split:左侧原片、右侧调色,分割线处画一条亮色细线 ----
+      放在所有调色运算之后,只替换输出颜色,不影响任何 grading 算法 */
+  if (u_split > 0.0001) {
+    vec3 orig = texture(u_tex, v_uv).rgb;
+    c = v_uv.x < u_split ? orig : c;
+    float lineW = 1.5 * texel.x;
+    c = mix(vec3(0.91, 0.64, 0.24), c, smoothstep(lineW, lineW * 2.0, abs(v_uv.x - u_split)));
+  }
 
   outColor = vec4(clamp(c, 0.0, 1.0), 1.0);
 }`;

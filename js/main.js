@@ -12,6 +12,9 @@
   const state = {
     values: buildValues(defaultPreset()),
     bypass: false,
+    compareOn: false,
+    splitMode: false,
+    split: 0.5,
     exporting: false,
     cancelled: false,
     file: null,
@@ -30,7 +33,7 @@
   /* ---------- 预览渲染循环 ---------- */
   function renderOnce() {
     if (!state.file || video.readyState < 2) return;
-    grader.render(video, state.values, state.bypass);
+    grader.render(video, state.values, state.bypass, state.splitMode ? state.split : 0);
   }
 
   const hasRVFC = 'requestVideoFrameCallback' in HTMLVideoElement.prototype;
@@ -54,6 +57,8 @@
   function fitCanvas() {
     if (!video.videoWidth) return;
     const stage = $('stage');
+    /* 移动端用 --video-ar 让舞台精确贴合视频宽高比(桌面端忽略该变量) */
+    stage.style.setProperty('--video-ar', video.videoWidth / video.videoHeight);
     const box = stage.getBoundingClientRect();
     const scale = Math.min(box.width / video.videoWidth, box.height / video.videoHeight);
     const w = Math.max(2, Math.floor(video.videoWidth * scale));
@@ -86,6 +91,7 @@
     $('btn-export').disabled = !ExportSupport.any;
     $('time-dur').textContent = fmtTime(video.duration);
     fitCanvas();
+    window.scrollTo(0, 0); /* 移动端加载后回到顶部,舞台完整可见 */
     video.play().catch(() => { /* 自动播放被拒时保持暂停,用户手动点播放 */ });
     syncPlayIcon();
   });
@@ -144,12 +150,49 @@
     input.style.setProperty('--fill', Math.max(0, Math.min(100, pct)) + '%');
   }
 
-  /* ---------- 对比原片(按住) ---------- */
+  /* ---------- 对比原片:点按切换(toggle)+ 按住预览(hold) ----------
+     state.compareOn 是持久的切换态;按住期间强制显示原片,松手恢复到切换态 */
   const btnCompare = $('btn-compare');
-  const setBypass = (on) => { state.bypass = on; renderOnce(); };
-  btnCompare.addEventListener('pointerdown', () => setBypass(true));
-  btnCompare.addEventListener('pointerup', () => setBypass(false));
-  btnCompare.addEventListener('pointerleave', () => setBypass(false));
+  const HOLD_MS = 300;
+  let holdStart = 0;
+  function syncCompareBtn() {
+    btnCompare.classList.toggle('active', state.bypass);
+    btnCompare.innerHTML = state.bypass
+      ? '原片 <span class="en">Original</span>'
+      : '对比 <span class="en">Compare</span>';
+  }
+  const setBypass = (on) => { state.bypass = on; syncCompareBtn(); renderOnce(); };
+  btnCompare.addEventListener('pointerdown', () => { holdStart = performance.now(); setBypass(true); });
+  btnCompare.addEventListener('pointerup', () => {
+    if (performance.now() - holdStart < HOLD_MS) state.compareOn = !state.compareOn;
+    setBypass(state.compareOn);
+  });
+  btnCompare.addEventListener('pointerleave', () => {
+    if (state.bypass !== state.compareOn) setBypass(state.compareOn);
+  });
+
+  /* ---------- 分屏对比:开启后在画面上左右拖动调整分割线 ---------- */
+  const btnSplit = $('btn-split');
+  btnSplit.addEventListener('click', () => {
+    state.splitMode = !state.splitMode;
+    btnSplit.classList.toggle('active', state.splitMode);
+    renderOnce();
+  });
+  let splitDragging = false;
+  const splitFromEvent = (e) => {
+    const r = canvas.getBoundingClientRect();
+    state.split = Math.max(0.02, Math.min(0.98, (e.clientX - r.left) / r.width));
+    renderOnce();
+  };
+  canvas.addEventListener('pointerdown', (e) => {
+    if (!state.splitMode) return;
+    splitDragging = true;
+    canvas.setPointerCapture(e.pointerId);
+    splitFromEvent(e);
+  });
+  canvas.addEventListener('pointermove', (e) => { if (splitDragging) splitFromEvent(e); });
+  ['pointerup', 'pointercancel'].forEach((ev) =>
+    canvas.addEventListener(ev, () => { splitDragging = false; }));
 
   /* ---------- 参数面板(由 params.js 配置表驱动) ---------- */
   const sliderRefs = {};

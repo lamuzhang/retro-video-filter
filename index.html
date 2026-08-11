@@ -5,9 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RetroGrade · 复古视频调色</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ccircle cx='8' cy='8' r='7' fill='%23e8a33d'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700&family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -58,7 +55,8 @@
       <span class="time" id="time-cur">0:00</span>
       <input type="range" class="seek" id="seek" min="0" max="1000" value="0" aria-label="进度条">
       <span class="time" id="time-dur">0:00</span>
-      <button class="btn btn-ghost" id="btn-compare" title="按住查看原片">对比原片<span class="en">Hold: Original</span></button>
+      <button class="btn btn-ghost" id="btn-compare" title="点按切换 · 按住预览原片 Tap: toggle · Hold: peek">对比 <span class="en">Compare</span></button>
+      <button class="btn btn-ghost" id="btn-split" title="分屏对比:在画面上左右拖动调整分割线 Split: drag on video">分屏 <span class="en">Split</span></button>
     </div>
     <p class="stage-hint" id="stage-hint" hidden></p>
   </section>

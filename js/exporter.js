@@ -8,7 +8,8 @@
 
 'use strict';
 
-const MEDIABUNNY_URL = 'https://cdn.jsdelivr.net/npm/mediabunny@1/+esm';
+/* 以页面基准 URL 解析,保证部署在子路径(如 GitHub Pages)时也指向站点内的 vendor 文件 */
+const MEDIABUNNY_URL = new URL('js/vendor/mediabunny.js', document.baseURI).href;
 
 const ExportSupport = (() => {
   const webcodecs = typeof VideoEncoder !== 'undefined';

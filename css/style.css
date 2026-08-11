@@ -14,8 +14,8 @@
   --danger: #e05d5d;
   --radius: 10px;
   --radius-sm: 6px;
-  --font-ui: 'Sora', 'Noto Sans SC', sans-serif;
-  --font-mono: 'IBM Plex Mono', 'Noto Sans SC', monospace;
+  --font-ui: ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', SFMono-Regular, Menlo, Consolas, 'PingFang SC', monospace;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -93,6 +93,13 @@ body {
 }
 .btn-primary:hover:not(:disabled) { background: linear-gradient(180deg, #f5c06e, #edaC4a); border-color: var(--accent-deep); }
 .btn-ghost { background: transparent; }
+.btn.active {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  box-shadow: inset 0 0 0 1px var(--accent);
+  color: var(--accent);
+}
+.btn.active .en { color: var(--accent-deep); }
 .btn-sm { padding: 5px 10px; font-size: 12px; }
 .btn-icon { padding: 8px 10px; }
 .btn .en { font-size: 10px; color: var(--text-faint); font-weight: 400; margin-left: 4px; }
@@ -122,7 +129,7 @@ body {
   overflow: hidden;
   display: flex; align-items: center; justify-content: center;
 }
-#preview-canvas { max-width: 100%; max-height: 100%; display: block; }
+#preview-canvas { max-width: 100%; max-height: 100%; display: block; touch-action: pan-y; }
 #src-video { display: none; }
 
 .dropzone {
@@ -284,10 +291,33 @@ input[type="range"]::-moz-range-thumb {
 .export-note { font-size: 12px; color: var(--text-dim); margin-top: 14px; line-height: 1.6; }
 .export-note.warn { color: var(--accent); }
 
-/* ---------- 移动端:上下布局 ---------- */
+/* ---------- 移动端:上下布局,舞台贴合视频宽高比 ---------- */
 @media (max-width: 900px) {
   body { overflow: auto; }
-  .layout { grid-template-columns: 1fr; grid-template-rows: minmax(300px, 52vh) auto; }
+  /* flex 纵向流式布局:不用 grid 自动行高(列向 flex 子项的本征高度会塌缩);
+     flex:none 让 .layout 高度随内容增长,否则桌面版的 flex:1 定高会把 stage-col 压缩塌缩 */
+  .layout { display: flex; flex-direction: column; flex: none; }
+  .stage-col { padding: 10px 10px 8px; gap: 8px; }
+  .stage {
+    flex: none;
+    width: 100%;
+    /* 宽度上限保证竖屏视频(如 9:16)高度不超过 62vh */
+    max-width: calc(62vh * var(--video-ar, 1.7778));
+    aspect-ratio: var(--video-ar, 16/9);
+    max-height: 62vh;
+    margin: 0 auto;
+  }
+  .controls { flex-wrap: wrap; padding: 8px 10px; gap: 8px; }
+  .seek { flex: 1 1 100%; order: 10; }
   .panel { border-left: none; border-top: 1px solid var(--line); overflow: visible; }
   .badge { display: none; }
+}
+
+/* ---------- 触屏:加大触控目标 ---------- */
+@media (pointer: coarse) {
+  .btn { min-height: 36px; }
+  input[type="range"] { height: 6px; }
+  input[type="range"]::-webkit-slider-thumb { width: 22px; height: 22px; }
+  input[type="range"]::-moz-range-thumb { width: 20px; height: 20px; }
+  .slider-row { padding: 8px 0; }
 }
