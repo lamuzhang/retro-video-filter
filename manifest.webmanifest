@@ -1,0 +1,16 @@
+{
+  "name": "RetroGrade 复古视频调色",
+  "short_name": "RetroGrade",
+  "description": "复古视频调色 · 本地处理,视频不出浏览器",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#101013",
+  "theme_color": "#101013",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
