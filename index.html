@@ -62,7 +62,7 @@
   </section>
 
   <aside class="panel" id="panel" hidden>
-    <div class="panel-section">
+    <div class="panel-section" data-cat="presets">
       <div class="panel-section-head">
         <h2>预设 <span class="en">Presets</span></h2>
         <button class="btn btn-ghost btn-sm" id="btn-reset">重置全部 Reset</button>
@@ -73,6 +73,13 @@
   </aside>
 
 </main>
+
+<nav class="rail" id="rail" aria-label="调色分类 Categories"></nav>
+<div class="sheet-backdrop" id="sheet-backdrop"></div>
+<section class="sheet" id="sheet" role="dialog" aria-label="参数面板 Parameters">
+  <button class="sheet-handle" id="sheet-handle" aria-label="收起面板 Close panel"><span></span></button>
+  <div class="sheet-body" id="sheet-body"></div>
+</section>
 
 <div class="export-overlay" id="export-overlay" hidden>
   <div class="export-card">

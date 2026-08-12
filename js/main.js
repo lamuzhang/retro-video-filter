@@ -201,6 +201,7 @@
     for (const g of PARAM_GROUPS) {
       const sec = document.createElement('div');
       sec.className = 'param-group panel-section';
+      sec.dataset.cat = g.id;
       const head = document.createElement('div');
       head.className = 'panel-section-head';
       const h2 = document.createElement('h2');
@@ -284,6 +285,93 @@
     document.querySelectorAll('.preset-btn').forEach((x) =>
       x.classList.toggle('active', x.dataset.preset === preset.id));
   });
+
+  /* ---------- 移动端底部工具栏 + 参数抽屉(剪映式) ----------
+     不复制参数系统:抽屉打开时把 buildPanel/buildPresets 生成的对应 section
+     从隐藏的 #panel 挪进 #sheet-body,关闭时按记录的原位挪回。
+     须在 buildPanel()/buildPresets() 之后调用(依赖生成的 section 记录原位) */
+  function buildMobileSheet() {
+    const rail = $('rail');
+    const sheet = $('sheet');
+    const sheetBody = $('sheet-body');
+    const sheetState = { cat: null };
+    const sectionHomes = new Map();
+    document.querySelectorAll('#panel .panel-section').forEach((sec) => {
+      sectionHomes.set(sec, { parent: sec.parentNode, next: sec.nextSibling });
+    });
+    const RAIL_CATS = [{ id: 'presets', zh: '预设', en: 'Presets' },
+      ...PARAM_GROUPS.map((g) => ({ id: g.id, zh: g.zh, en: g.en }))];
+
+    for (const cat of RAIL_CATS) {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'rail-btn';
+      b.dataset.cat = cat.id;
+      b.setAttribute('aria-expanded', 'false');
+      b.setAttribute('aria-selected', 'false');
+      b.setAttribute('aria-controls', 'sheet');
+      b.innerHTML = '<span class="zh">' + cat.zh + '</span><span class="en">' + cat.en + '</span>';
+      b.addEventListener('click', () => {
+        if (sheetState.cat === cat.id) closeSheet(); else openSheet(cat.id);
+      });
+      rail.appendChild(b);
+    }
+
+    function syncRail() {
+      rail.querySelectorAll('.rail-btn').forEach((b) => {
+        const on = b.dataset.cat === sheetState.cat;
+        b.classList.toggle('active', on);
+        b.setAttribute('aria-expanded', on ? 'true' : 'false');
+        b.setAttribute('aria-selected', on ? 'true' : 'false');
+      });
+    }
+
+    function returnSectionHome() {
+      const sec = sheetBody.firstElementChild;
+      if (!sec) return;
+      const home = sectionHomes.get(sec);
+      home.parent.insertBefore(sec, home.next);
+      sheetState.cat = null;
+    }
+
+    /* 抽屉不得遮挡舞台与控制条:高度上限 = 视口 - 控制条下沿 - 工具栏高 - 余量 */
+    function applySheetCap() {
+      const railH = rail.getBoundingClientRect().height;
+      const controlsBottom = $('controls').getBoundingClientRect().bottom;
+      const avail = window.innerHeight - controlsBottom - railH - 8;
+      sheet.style.maxHeight = Math.max(160, Math.min(window.innerHeight * 0.58, avail)) + 'px';
+    }
+
+    function openSheet(cat) {
+      if (sheetState.cat) returnSectionHome(); // 切换分类:只换内容,不关抽屉
+      const sec = document.querySelector('#panel [data-cat="' + cat + '"]');
+      if (!sec) return;
+      sheetBody.appendChild(sec);
+      sheetState.cat = cat;
+      window.scrollTo(0, 0);
+      document.body.classList.add('sheet-open');
+      syncRail();
+      fitCanvas();      // 舞台收缩后重算画布尺寸
+      applySheetCap();  // 依赖收缩后的控制条位置
+    }
+
+    function closeSheet() {
+      if (!sheetState.cat) return;
+      returnSectionHome();
+      document.body.classList.remove('sheet-open');
+      sheet.style.maxHeight = '';
+      syncRail();
+      fitCanvas();
+    }
+
+    $('sheet-handle').addEventListener('click', closeSheet);
+    $('sheet-backdrop').addEventListener('click', closeSheet);
+    document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSheet(); });
+    window.addEventListener('resize', () => { if (sheetState.cat) applySheetCap(); });
+    matchMedia('(max-width: 900px)').addEventListener('change', (e) => {
+      if (!e.matches) closeSheet(); // 转回桌面端前把 section 归还侧栏
+    });
+  }
 
   /* ---------- 导出 ---------- */
   const overlay = $('export-overlay');
@@ -382,6 +470,7 @@
   }
   buildPanel();
   buildPresets();
+  buildMobileSheet();
   startLoop();
   window.__dbg = { state, grader, video, renderOnce };
 })();
