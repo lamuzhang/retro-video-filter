@@ -348,7 +348,9 @@ input[type="range"]::-moz-range-thumb {
   .sheet-backdrop {
     display: block;
     position: fixed; inset: 0; z-index: 44;
-    background: rgba(5, 5, 8, 0.5);
+    /* 调色工具必须所见即所得:遮罩全透明,只保留点击关闭手势,
+       不再压暗视频预览(原为 rgba(5,5,8,0.5)) */
+    background: rgba(5, 5, 8, 0);
     opacity: 0; pointer-events: none;
     transition: opacity 0.25s;
   }
