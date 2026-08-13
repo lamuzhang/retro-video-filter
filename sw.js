@@ -1,7 +1,7 @@
 /* sw.js — RetroGrade 离线缓存:全站资源本地优先,更新时自动换版本 */
 'use strict';
 
-const VERSION = 'retrograde-v1';
+const VERSION = 'retrograde-v2';
 const ASSETS = [
   './',
   './index.html',
